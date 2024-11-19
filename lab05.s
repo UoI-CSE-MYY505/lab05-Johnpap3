@@ -65,41 +65,56 @@ next:
 taken:
 
 # ----------------------------------------------------------------------------------------
-# TODO: Add an example where an instruction passes its result to the 2nd following instruction
+# Example where an instruction passes its result to the 2nd following instruction
 # There should be no stalls
 # ----------------------------------------------------------------------------------------
+    addi t0, zero, 5    # t0 = 5
+    addi t1, t0, 2      # t1 = t0 + 2 = 7
+    add  t2, t0, t1     # t2 = t0 + t1 = 5 + 7 = 12
     # nop instructions added between examples
     add  zero, zero, zero  
     add  zero, zero, zero  
     add  zero, zero, zero  
 
 # ----------------------------------------------------------------------------------------
-# TODO: Add an example with a double hazard and check that it works corretly.
-# A double hazzard is when the source register of an instruction matches the destination
-#  registers of both of the two instructions preceeding it. It should get the newest value.
-# There should be no stalls
+# Example with a double hazard, ensuring that the newest value is forwarded
+# No stalls expected
 # ----------------------------------------------------------------------------------------
+    addi t3, zero, 5    # t3 = 5
+    addi t3, t3, 2      # t3 = t3 + 2 = 7
+    add  t4, t3, t3     # t4 should use the newest value of t3 (7), so t4 = 7 + 7 = 14
     # nop instructions added between examples
     add  zero, zero, zero  
     add  zero, zero, zero  
     add  zero, zero, zero  
 
 # ----------------------------------------------------------------------------------------
-# TODO: Add an example with a load stalling for 1 cycle to pass a value to a NOT-TAKEN branch 
-#  Is this a data hazard or a control hazard?
+# Example with load passing value to a NOT-TAKEN branch (1 cycle stall)
+# Identify if this is a data or control hazard
 # ----------------------------------------------------------------------------------------
+    lw   t5, 8(a0)      # Load t5 with storage[2] = 11
+    beq  t5, s0, after_load # Branch is NOT taken (t5 != 0)
+    add  t6, t5, s1     # This instruction will execute; t6 = 11 + 1 = 12
+after_load:
     # nop instructions added between examples
     add  zero, zero, zero  
     add  zero, zero, zero  
     add  zero, zero, zero  
 
 # ----------------------------------------------------------------------------------------
-# TODO: Add an example with taken branch to a label which is immediately following the branch
+# Example with a taken branch to the next instruction (self-referential branch)
 # ----------------------------------------------------------------------------------------
+    beq  s1, s1, immediate_next # This branch will be taken
+immediate_next:
+    # nop instructions added between examples
+    add  zero, zero, zero  
+    add  zero, zero, zero  
+    add  zero, zero, zero  
 
-
-
+# ----------------------------------------------------------------------------------------
+# Exit program
+# ----------------------------------------------------------------------------------------
 exit:  
     addi      a7, zero, 10    
-    ecall
+    ecall  
 
